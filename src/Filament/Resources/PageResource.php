@@ -2,12 +2,19 @@
 
 namespace Fuelviews\SabHeroArticles\Filament\Resources;
 
-use Filament\Forms\Form;
+use BackedEnum;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ReplicateAction;
+use Filament\Actions\ViewAction;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Fuelviews\SabHeroArticles\Filament\Resources\PageResource\Pages\CreatePage;
@@ -16,14 +23,15 @@ use Fuelviews\SabHeroArticles\Filament\Resources\PageResource\Pages\ListPages;
 use Fuelviews\SabHeroArticles\Filament\Resources\PageResource\Pages\ViewPage;
 use Fuelviews\SabHeroArticles\Models\Page;
 use Illuminate\Support\Str;
+use UnitEnum;
 
 class PageResource extends Resource
 {
     protected static ?string $model = Page::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-book-open';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-book-open';
 
-    protected static ?string $navigationGroup = 'SEO';
+    protected static UnitEnum|string|null $navigationGroup = 'SEO';
 
     protected static ?int $navigationSort = 1;
 
@@ -32,9 +40,9 @@ class PageResource extends Resource
         return (string) Page::count();
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema(Page::getForm());
     }
 
@@ -75,11 +83,11 @@ class PageResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\ReplicateAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                    ReplicateAction::make()
                         ->color('info')
                         ->beforeReplicaSaved(function (Page $replica): void {
                             $replica->title = $replica->title.' (Copy)';
@@ -93,19 +101,19 @@ class PageResource extends Resource
                             }
                         })
                         ->successNotificationTitle('Page copied successfully'),
-                    Tables\Actions\DeleteAction::make(),
+                    DeleteAction::make(),
                 ])->iconButton(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist->schema([
+        return $schema->schema([
             Section::make('Page')
                 ->schema([
                     TextEntry::make('title'),

@@ -2,16 +2,21 @@
 
 namespace Fuelviews\SabHeroArticles\Filament\Resources;
 
+use BackedEnum;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\Fieldset;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
-use Filament\Pages\SubNavigationPosition;
+use Filament\Pages\Enums\SubNavigationPosition;
 use Filament\Resources\Pages\Page;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Fuelviews\SabHeroArticles\Filament\Resources\UserResource\Pages\CreateUser;
@@ -19,36 +24,34 @@ use Fuelviews\SabHeroArticles\Filament\Resources\UserResource\Pages\EditUser;
 use Fuelviews\SabHeroArticles\Filament\Resources\UserResource\Pages\ListUsers;
 use Fuelviews\SabHeroArticles\Filament\Resources\UserResource\Pages\ViewUser;
 use Illuminate\Support\Str;
+use UnitEnum;
 
 class UserResource extends Resource
 {
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $navigationGroup = 'Settings';
+    protected static UnitEnum|string|null $navigationGroup = 'Settings';
 
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?int $navigationSort = 1;
 
-    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
+    protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
-    public static function getModel(): string
-    {
-        return config('sabhero-articles.user.model');
-    }
+    protected static ?string $model = \App\Models\User::class;
+
+    protected static ?string $recordRouteKeyName = 'id';
 
     public static function getNavigationBadge(): ?string
     {
-        $userModel = static::getModel();
-
-        return (string) $userModel::authors()->count();
+        return (string) static::$model::authors()->count();
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
-                Forms\Components\Section::make('User Information')
+                SchemaSection::make('User Information')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()
@@ -77,7 +80,7 @@ class UserResource extends Resource
                             ->helperText('Make this user visible as a article author'),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Author Information')
+                SchemaSection::make('Author Information')
                     ->schema([
                         Forms\Components\Textarea::make('bio')
                             ->maxLength(65535)
@@ -95,7 +98,7 @@ class UserResource extends Resource
                             ->columnSpanFull(),
                     ]),
 
-                Forms\Components\Section::make('Avatar')
+                SchemaSection::make('Avatar')
                     ->schema([
                         SpatieMediaLibraryFileUpload::make('avatar')
                             ->disk(config('sabhero-articles.media.disk'))
@@ -153,23 +156,21 @@ class UserResource extends Resource
                     ->trueLabel('Authors only')
                     ->falseLabel('Non-authors only'),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make(),
-                ])->iconButton(),
+            ->recordActions([
+                EditAction::make()
+                    ->url(fn ($record) => UserResource::getUrl('edit', ['record' => $record->getKey()])),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist->schema([
+        return $schema->schema([
             Section::make('User Details')
                 ->schema([
                     Fieldset::make('Basic Information')

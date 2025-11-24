@@ -2,16 +2,25 @@
 
 namespace Fuelviews\SabHeroArticles\Filament\Resources;
 
+use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ReplicateAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\Fieldset;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
-use Filament\Pages\SubNavigationPosition;
+use Filament\Pages\Enums\SubNavigationPosition;
 use Filament\Resources\Pages\Page;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Fuelviews\SabHeroArticles\Actions\PostExportAction;
@@ -26,29 +35,30 @@ use Fuelviews\SabHeroArticles\Filament\Resources\PostResource\Widgets\ArticlePos
 use Fuelviews\SabHeroArticles\Filament\Tables\Columns\UserAvatar;
 use Fuelviews\SabHeroArticles\Models\Post;
 use Illuminate\Support\Str;
+use UnitEnum;
 
 class PostResource extends Resource
 {
     protected static ?string $model = Post::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-minus';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-minus';
 
-    protected static ?string $navigationGroup = 'Article';
+    protected static UnitEnum|string|null $navigationGroup = 'Article';
 
     protected static ?string $recordTitleAttribute = 'title';
 
     protected static ?int $navigationSort = 0;
 
-    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
+    protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
     public static function getNavigationBadge(): ?string
     {
         return (string) Post::count();
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema(Post::getForm());
     }
 
@@ -105,8 +115,8 @@ class PostResource extends Resource
                     ->preload()
                     ->multiple(),
             ])
-            ->headerActions([
-                Tables\Actions\ImportAction::make()
+            ->toolbarActions([
+                Action::make('import')
                     ->label('Import posts')
                     ->icon('heroicon-o-arrow-up-tray')
                     ->color('gray')
@@ -118,12 +128,28 @@ class PostResource extends Resource
                     ])
                     ->action(fn (array $data) => static::importFromZip($data['zip_file']))
                     ->requiresConfirmation(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    BulkAction::make('export_csv_and_images')
+                        ->label('Export posts (csv)')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('gray')
+                        ->action(fn ($records) => static::exportToZip($records))
+                        ->requiresConfirmation(),
+                    BulkAction::make('export_migration')
+                        ->label('Export posts (migration)')
+                        ->icon('heroicon-o-code-bracket')
+                        ->color('info')
+                        ->action(fn ($records) => static::exportMigration($records))
+                        ->requiresConfirmation()
+                        ->modalDescription('Export posts as a migration file package that can be copied to another project. Includes migration file, images, and installation instructions.'),
+                ]),
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\ReplicateAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                    ReplicateAction::make()
                         ->color('info')
                         ->excludeAttributes(['scheduled_for'])
                         ->beforeReplicaSaved(function (Post $replica, array $data): void {
@@ -145,32 +171,14 @@ class PostResource extends Resource
                             }
                         })
                         ->successNotificationTitle('Post copied successfully'),
-                    Tables\Actions\DeleteAction::make(),
+                    DeleteAction::make(),
                 ])->iconButton(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\BulkAction::make('export_csv_and_images')
-                        ->label('Export posts (csv)')
-                        ->icon('heroicon-o-arrow-down-tray')
-                        ->color('gray')
-                        ->action(fn ($records) => static::exportToZip($records))
-                        ->requiresConfirmation(),
-                    Tables\Actions\BulkAction::make('export_migration')
-                        ->label('Export posts (migration)')
-                        ->icon('heroicon-o-code-bracket')
-                        ->color('info')
-                        ->action(fn ($records) => static::exportMigration($records))
-                        ->requiresConfirmation()
-                        ->modalDescription('Export posts as a migration file package that can be copied to another project. Includes migration file, images, and installation instructions.'),
-                ]),
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist->schema([
+        return $schema->schema([
             Section::make('Post Details')
                 ->schema([
                     Fieldset::make('General Information')

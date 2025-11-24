@@ -1,28 +1,35 @@
 <?php
 
 namespace Fuelviews\SabHeroArticles\Filament\Resources;
-
-use Filament\Forms\Form;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
+use BackedEnum;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ReplicateAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables;
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextEntry;
 use Fuelviews\SabHeroArticles\Filament\Resources\CategoryResource\Pages\EditCategory;
 use Fuelviews\SabHeroArticles\Filament\Resources\CategoryResource\Pages\ListCategories;
 use Fuelviews\SabHeroArticles\Filament\Resources\CategoryResource\Pages\ViewCategory;
 use Fuelviews\SabHeroArticles\Filament\Resources\CategoryResource\RelationManagers\PostsRelationManager;
 use Fuelviews\SabHeroArticles\Models\Category;
 use Illuminate\Support\Str;
+use UnitEnum;
 
 class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-squares-plus';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-plus';
 
-    protected static ?string $navigationGroup = 'Article';
+    protected static UnitEnum|string|null $navigationGroup = 'Article';
 
     protected static ?int $navigationSort = 1;
 
@@ -31,11 +38,7 @@ class CategoryResource extends Resource
         return (string) Category::count();
     }
 
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema(Category::getForm());
-    }
+
 
     public static function table(Table $table): Table
     {
@@ -69,39 +72,26 @@ class CategoryResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\ReplicateAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                    ReplicateAction::make()
                         ->color('info')
                         ->excludeAttributes(['posts_count'])
                         ->beforeReplicaSaved(function ($replica): void {
-                            $replica->name = $replica->name.' (Copy)';
-                            $replica->slug = Str::slug($replica->name.' copy '.time());
+                            $replica->name = $replica->name . ' (Copy)';
+                            $replica->slug = Str::slug($replica->name . ' copy ' . time());
                         })
                         ->successNotificationTitle('Category copied successfully'),
-                    Tables\Actions\DeleteAction::make(),
+                    DeleteAction::make(),
                 ])->iconButton(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
-    }
-
-    public static function infolist(Infolist $infolist): Infolist
-    {
-        return $infolist->schema([
-            Section::make('Category')
-                ->schema([
-                    TextEntry::make('name'),
-
-                    TextEntry::make('slug'),
-                ])->columns(2)
-                ->icon('heroicon-o-square-3-stack-3d'),
-        ]);
     }
 
     public static function getRelations(): array

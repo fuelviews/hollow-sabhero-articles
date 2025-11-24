@@ -2,11 +2,18 @@
 
 namespace Fuelviews\SabHeroArticles\Filament\Resources;
 
-use Filament\Forms\Form;
+use BackedEnum;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ReplicateAction;
+use Filament\Actions\ViewAction;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Fuelviews\SabHeroArticles\Filament\Resources\TagResource\Pages\EditTag;
@@ -15,14 +22,15 @@ use Fuelviews\SabHeroArticles\Filament\Resources\TagResource\Pages\ViewTag;
 use Fuelviews\SabHeroArticles\Filament\Resources\TagResource\RelationManagers\PostsRelationManager;
 use Fuelviews\SabHeroArticles\Models\Tag;
 use Illuminate\Support\Str;
+use UnitEnum;
 
 class TagResource extends Resource
 {
     protected static ?string $model = Tag::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-tag';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
-    protected static ?string $navigationGroup = 'Article';
+    protected static UnitEnum|string|null $navigationGroup = 'Article';
 
     protected static ?int $navigationSort = 2;
 
@@ -31,9 +39,9 @@ class TagResource extends Resource
         return (string) Tag::count();
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema(Tag::getForm());
     }
 
@@ -69,11 +77,11 @@ class TagResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
-                    Tables\Actions\ReplicateAction::make()
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                    ReplicateAction::make()
                         ->color('info')
                         ->excludeAttributes(['posts_count'])
                         ->beforeReplicaSaved(function ($replica): void {
@@ -81,19 +89,19 @@ class TagResource extends Resource
                             $replica->slug = Str::slug($replica->name.' copy '.time());
                         })
                         ->successNotificationTitle('Tag copied successfully'),
-                    Tables\Actions\DeleteAction::make(),
+                    DeleteAction::make(),
                 ])->iconButton(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist->schema([
+        return $schema->schema([
             Section::make('Tag')
                 ->schema([
                     TextEntry::make('name'),

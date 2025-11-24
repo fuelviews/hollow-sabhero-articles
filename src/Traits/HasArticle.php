@@ -81,4 +81,26 @@ trait HasArticle
                 $q->where('status', 'published');
             });
     }
+
+    /**
+     * Get author avatar URL with intelligent fallback
+     */
+    public function getAuthorAvatarUrl(): string
+    {
+        // Try media library first (if Spatie Media Library is available)
+        if (method_exists($this, 'getFirstMedia')) {
+            $media = $this->getFirstMedia('avatar');
+            if ($media && method_exists($media, 'getUrl') && $media->getUrl()) {
+                return $media->getUrl();
+            }
+        }
+
+        // Try avatar_url attribute
+        if (! empty($this->avatar_url)) {
+            return $this->avatar_url;
+        }
+
+        // Fallback to generated avatar
+        return 'https://ui-avatars.com/api/?name='.urlencode($this->name).'&color=7F9CF5&background=EBF4FF&rounded=true';
+    }
 }

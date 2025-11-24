@@ -24,10 +24,9 @@
         "diglactic/laravel-breadcrumbs": "^10.0||^9.0",
         "embed/embed": "^4.4",
         "filament/spatie-laravel-media-library-plugin": "^3.3",
-        "filament/support": "^3.3",
+        "filament/support": "^4.0",
         "illuminate/contracts": "^10.0||^11.0||^12.0",
         "ralphjsmit/laravel-glide": "*",
-        "spatie/filament-markdown-editor": "^2.0",
         "spatie/laravel-feed": "^4.4",
         "spatie/laravel-package-tools": "^1.92"
     },

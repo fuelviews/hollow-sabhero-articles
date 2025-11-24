@@ -3,8 +3,8 @@
 namespace Fuelviews\SabHeroArticles\Filament\Resources\PostResource\Pages;
 
 use Filament\Actions;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Schemas\Components\Tabs\Tab;
 use Fuelviews\SabHeroArticles\Filament\Resources\PostResource;
 use Fuelviews\SabHeroArticles\Filament\Resources\PostResource\Widgets\ArticlePostPublishedChart;
 

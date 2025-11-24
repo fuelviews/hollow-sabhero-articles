@@ -3,9 +3,9 @@
 namespace Fuelviews\SabHeroArticles\Models;
 
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Fieldset;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -22,7 +22,6 @@ use RalphJSmit\Laravel\SEO\Support\HasSEO;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
 use Spatie\Feed\Feedable;
 use Spatie\Feed\FeedItem;
-use Spatie\FilamentMarkdownEditor\MarkdownEditor;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -176,10 +175,11 @@ class Post extends Model implements Feedable, HasMedia
                                 ->columnSpanFull(),
                         ]),
 
-                    MarkdownEditor::make('body')
-                        ->fileAttachmentsDisk(config('sabhero-articles.media.disk'))
-                        ->fileAttachmentsVisibility('public')
+                    Textarea::make('body')
+                        ->label('Content (Markdown)')
+                        ->rows(10)
                         ->required()
+                        ->helperText('Enter your content in Markdown format')
                         ->columnSpanFull(),
 
                     Section::make('Featured Image')

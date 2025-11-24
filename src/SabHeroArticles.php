@@ -25,7 +25,8 @@ class SabHeroArticles implements Plugin
             Filament\Resources\CategoryResource::class,
             Filament\Resources\PostResource::class,
             Filament\Resources\TagResource::class,
-            Filament\Resources\PageResource::class,
+            // PageResource removed - using App\Filament\Resources\Pages\PageResource instead
+            // Filament\Resources\PageResource::class,
             Filament\Resources\UserResource::class,
         ]);
 
