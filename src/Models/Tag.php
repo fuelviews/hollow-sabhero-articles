@@ -3,7 +3,7 @@
 namespace Fuelviews\SabHeroArticles\Models;
 
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Set;
+use Filament\Schemas\Components\Utilities\Set;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -24,23 +24,23 @@ class Tag extends Model
 
     public function posts(): BelongsToMany
     {
-        return $this->belongsToMany(Post::class, config('sabhero-articles.tables.prefix').'post_'.config('sabhero-articles.tables.prefix').'tag');
+        return $this->belongsToMany(Post::class, config('sabhero-articles.tables.prefix') . 'post_' . config('sabhero-articles.tables.prefix') . 'tag');
     }
 
     public static function getForm(): array
     {
         return [
             TextInput::make('name')
-                ->live(true)->afterStateUpdated(fn (Set $set, ?string $state) => $set(
+                ->live(true)->afterStateUpdated(fn(Set $set, ?string $state) => $set(
                     'slug',
                     Str::slug($state)
                 ))
-                ->unique(config('sabhero-articles.tables.prefix').'tags', 'name', null, 'id')
+                ->unique(config('sabhero-articles.tables.prefix') . 'tags', 'name', null, 'id')
                 ->required()
                 ->maxLength(50),
 
             TextInput::make('slug')
-                ->unique(config('sabhero-articles.tables.prefix').'tags', 'slug', null, 'id')
+                ->unique(config('sabhero-articles.tables.prefix') . 'tags', 'slug', null, 'id')
                 ->readOnly()
                 ->maxLength(155),
         ];
@@ -58,6 +58,6 @@ class Tag extends Model
 
     public function getTable(): string
     {
-        return config('sabhero-articles.tables.prefix').'tags';
+        return config('sabhero-articles.tables.prefix') . 'tags';
     }
 }
