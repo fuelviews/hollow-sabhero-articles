@@ -6,8 +6,8 @@
                     <div class="space-y-10">
                         <div>
                             <div class="flex flex-col justify-end">
-                                <div class="mb-6 lg:mb-16 h-full w-full overflow-hidden bg-slate-200 rounded-2xl shadow-2xl">
-                                    @if ($post->hasMedia('post_feature_image'))
+                                @if ($post->hasMedia('post_feature_image'))
+                                    <div class="mb-6 lg:mb-16 h-full w-full overflow-hidden bg-slate-200 rounded-2xl shadow-2xl">
                                         <img
                                             srcset="{{ $post->getFirstMedia('post_feature_image')->getSrcset() }}"
                                             src="{{ $post->getFirstMedia('post_feature_image')->getUrl() }}"
@@ -15,10 +15,8 @@
                                             class="flex h-full w-full min-h-[200px] max-h-[500px] items-center justify-center object-cover object-center"
                                             loading="eager"
                                         >
-                                    @else
-                                        <p>No featured image available.</p>
-                                    @endif
-                                </div>
+                                    </div>
+                                @endif
                                 <hr class="mb-6 h-[2px] border-t-0 bg-transparent bg-gradient-to-r from-transparent via-slate-200">
                                 <div>
                                     <article class="w-full mx-auto">
