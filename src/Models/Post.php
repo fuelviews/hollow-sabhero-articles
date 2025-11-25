@@ -197,12 +197,11 @@ class Post extends Model implements Feedable, HasMedia
                                 ->responsiveImages()
                                 ->image()
                                 ->collection('post_feature_image')
-                                ->label('Featured Image')
-                                ->required(),
+                                ->collection('post_feature_image')
+                                ->label('Featured Image (recommended)'),
 
                             TextInput::make('post_feature_image_alt_text')
-                                ->label('Alt Text')
-                                ->required(),
+                                ->label('Alt Text'),
                         ])->collapsible(),
 
                     Fieldset::make('Status')

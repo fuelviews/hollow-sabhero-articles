@@ -45,6 +45,7 @@ class SabHeroArticlesServiceProvider extends PackageServiceProvider
                 'rename_media_collection_names',
                 'drop_feature_image_columns',
                 'rename_page_slug_to_route',
+                'make_post_feature_image_alt_text_nullable',
             ])
 
             ->hasViewComponents(
@@ -85,10 +86,12 @@ class SabHeroArticlesServiceProvider extends PackageServiceProvider
         View::composer([
             '*',
         ], static function ($view) {
-            if (request()->route() &&
+            if (
+                request()->route() &&
                 in_array(request()->route()->getName(), [
                     'sabhero-articles.post.show',
-                ])) {
+                ])
+            ) {
                 $seoPost = request()->route('post');
 
                 $view->with([
@@ -117,14 +120,14 @@ class SabHeroArticlesServiceProvider extends PackageServiceProvider
     public function packageBooted(): void
     {
         $this->publishes([
-            __DIR__.'/../database/seeders/PageTableSeeder.php' => database_path('seeders/PageTableSeeder.php'),
+            __DIR__ . '/../database/seeders/PageTableSeeder.php' => database_path('seeders/PageTableSeeder.php'),
         ], 'sabhero-articles-seeders');
 
         // Register FeedServiceProvider after views are registered
         $this->app->register(FeedServiceProvider::class);
 
         // Register Livewire components if Livewire is available and not in testing
-        if (class_exists(\Livewire\Livewire::class) && ! $this->app->environment('testing')) {
+        if (class_exists(\Livewire\Livewire::class) && !$this->app->environment('testing')) {
             Livewire::component('sabhero-articles::search-autocomplete', SearchAutocomplete::class);
         }
     }
@@ -132,7 +135,7 @@ class SabHeroArticlesServiceProvider extends PackageServiceProvider
     public function loadTestingMigration(): void
     {
         if ($this->app->environment('testing')) {
-            $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+            $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         }
     }
 }

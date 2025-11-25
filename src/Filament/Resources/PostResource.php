@@ -13,10 +13,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ReplicateAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
-use Filament\Infolists\Components\Fieldset;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Pages\Enums\SubNavigationPosition;
 use Filament\Resources\Pages\Page;
 use Filament\Resources\Resource;
@@ -126,7 +122,7 @@ class PostResource extends Resource
                             ->acceptedFileTypes(['application/zip'])
                             ->required(),
                     ])
-                    ->action(fn (array $data) => static::importFromZip($data['zip_file']))
+                    ->action(fn(array $data) => static::importFromZip($data['zip_file']))
                     ->requiresConfirmation(),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
@@ -134,13 +130,13 @@ class PostResource extends Resource
                         ->label('Export posts (csv)')
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('gray')
-                        ->action(fn ($records) => static::exportToZip($records))
+                        ->action(fn($records) => static::exportToZip($records))
                         ->requiresConfirmation(),
                     BulkAction::make('export_migration')
                         ->label('Export posts (migration)')
                         ->icon('heroicon-o-code-bracket')
                         ->color('info')
-                        ->action(fn ($records) => static::exportMigration($records))
+                        ->action(fn($records) => static::exportMigration($records))
                         ->requiresConfirmation()
                         ->modalDescription('Export posts as a migration file package that can be copied to another project. Includes migration file, images, and installation instructions.'),
                 ]),
@@ -153,8 +149,8 @@ class PostResource extends Resource
                         ->color('info')
                         ->excludeAttributes(['scheduled_for'])
                         ->beforeReplicaSaved(function (Post $replica, array $data): void {
-                            $replica->title = $replica->title.' (Copy)';
-                            $replica->slug = Str::slug($replica->title.' copy '.time());
+                            $replica->title = $replica->title . ' (Copy)';
+                            $replica->slug = Str::slug($replica->title . ' copy ' . time());
                             $replica->scheduled_for = null;
                         })
                         ->afterReplicaSaved(function (Post $replica, Post $original): void {
@@ -176,81 +172,6 @@ class PostResource extends Resource
             ]);
     }
 
-    public static function infolist(Schema $schema): Schema
-    {
-        return $schema->schema([
-            Section::make('Post Details')
-                ->schema([
-                    Fieldset::make('General Information')
-                        ->schema([
-                            TextEntry::make('title')
-                                ->label('Title'),
-
-                            TextEntry::make('slug')
-                                ->label('Slug'),
-
-                            TextEntry::make('sub_title')
-                                ->label('Sub Title'),
-
-                            TextEntry::make('body')
-                                ->label('Content')
-                                ->markdown()
-                                ->columnSpanFull(),
-                        ]),
-                    Fieldset::make('Author and Meta')
-                        ->schema([
-                            TextEntry::make('user.name')
-                                ->label('Author'),
-
-                            TextEntry::make('created_at')
-                                ->label('Created At')
-                                ->dateTime('M j, Y g:i A')
-                                ->timezone('America/New_York'),
-
-                            TextEntry::make('updated_at')
-                                ->label('Last Updated')
-                                ->dateTime('M j, Y g:i A')
-                                ->timezone('America/New_York'),
-                        ]),
-                    Fieldset::make('Categories and Tags')
-                        ->schema([
-                            TextEntry::make('categories.name')
-                                ->label('Categories'),
-
-                            TextEntry::make('tags.name')
-                                ->label('Tags'),
-                        ]),
-                    Fieldset::make('Media')
-                        ->schema([
-                            SpatieMediaLibraryImageEntry::make('feature_image')
-                                ->collection('post_feature_image')
-                                ->label('Featured Image'),
-
-                            TextEntry::make('post_feature_image_alt_text')
-                                ->label('Alt Text'),
-                        ]),
-                    Fieldset::make('Publishing Information')
-                        ->schema([
-                            TextEntry::make('status')
-                                ->label('Status')
-                                ->badge()
-                                ->color(fn ($state) => $state->getColor()),
-
-                            TextEntry::make('published_at')
-                                ->label('Published At')
-                                ->dateTime('M j, Y g:i A')
-                                ->timezone('America/New_York')
-                                ->visible(fn (Post $record) => $record->status === PostStatus::PUBLISHED),
-
-                            TextEntry::make('scheduled_for')
-                                ->label('Scheduled For')
-                                ->dateTime('M j, Y g:i A')
-                                ->timezone('America/New_York')
-                                ->visible(fn (Post $record) => $record->status === PostStatus::SCHEDULED),
-                        ]),
-                ]),
-        ]);
-    }
 
     /**
      * Export posts to ZIP file with CSV and images
