@@ -125,7 +125,7 @@ class UserResource extends Resource
 
                 Tables\Columns\ImageColumn::make('avatar')
                     ->label('Avatar')
-                    ->getStateUsing(fn ($record) => $record->getAuthorAvatarUrl())
+                    ->getStateUsing(fn($record) => $record->getAuthorAvatarUrl())
                     ->circular(),
 
                 Tables\Columns\IconColumn::make('is_author')
@@ -158,7 +158,7 @@ class UserResource extends Resource
             ])
             ->recordActions([
                 EditAction::make()
-                    ->url(fn ($record) => UserResource::getUrl('edit', ['record' => $record->getKey()])),
+                    ->url(fn($record) => UserResource::getUrl('edit', ['record' => $record->getKey()])),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
@@ -186,7 +186,7 @@ class UserResource extends Resource
 
                             TextEntry::make('is_author')
                                 ->label('Is Author')
-                                ->formatStateUsing(fn ($state) => $state ? 'Yes' : 'No'),
+                                ->formatStateUsing(fn($state) => $state ? 'Yes' : 'No'),
                         ]),
 
                     Fieldset::make('Author Information')
@@ -201,11 +201,11 @@ class UserResource extends Resource
                         ->schema([
                             TextEntry::make('posts_count')
                                 ->label('Total Posts')
-                                ->getStateUsing(fn ($record) => $record->posts()->count()),
+                                ->getStateUsing(fn($record) => $record->posts()->count()),
 
                             TextEntry::make('published_posts_count')
                                 ->label('Published Posts')
-                                ->getStateUsing(fn ($record) => $record->posts()->published()->count()),
+                                ->getStateUsing(fn($record) => $record->posts()->published()->count()),
 
                             TextEntry::make('created_at')
                                 ->label('Joined')
@@ -219,7 +219,7 @@ class UserResource extends Resource
                     Fieldset::make('Avatar')
                         ->schema([
                             \Filament\Infolists\Components\ImageEntry::make('avatar')
-                                ->getStateUsing(fn ($record) => $record->getAuthorAvatarUrl())
+                                ->getStateUsing(fn($record) => $record->getAuthorAvatarUrl())
                                 ->label('')
                                 ->height(150)
                                 ->width(150),

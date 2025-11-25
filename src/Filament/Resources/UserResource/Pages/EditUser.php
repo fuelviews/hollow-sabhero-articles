@@ -13,8 +13,17 @@ class EditUser extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make(),
+            Actions\ViewAction::make()
+                ->url(fn($record) => UserResource::getUrl('view', ['record' => $record->getKey()])),
             Actions\DeleteAction::make(),
+        ];
+    }
+
+    public function getBreadcrumbs(): array
+    {
+        return [
+            // UserResource::getUrl() => UserResource::getBreadcrumb(),
+            // UserResource::getUrl('view', ['record' => $this->getRecord()]) => $this->getRecordTitle(),
         ];
     }
 }
