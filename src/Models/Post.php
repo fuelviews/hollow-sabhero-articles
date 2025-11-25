@@ -10,7 +10,7 @@ use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
-use Filament\Forms\Set;
+use Filament\Schemas\Components\Utilities\Set;
 use Fuelviews\SabHeroArticles\Enums\PostStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -57,12 +57,12 @@ class Post extends Model implements Feedable, HasMedia
 
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(Category::class, config('sabhero-articles.tables.prefix').'category_'.config('sabhero-articles.tables.prefix').'post');
+        return $this->belongsToMany(Category::class, config('sabhero-articles.tables.prefix') . 'category_' . config('sabhero-articles.tables.prefix') . 'post');
     }
 
     public function tags(): BelongsToMany
     {
-        return $this->belongsToMany(Tag::class, config('sabhero-articles.tables.prefix').'post_'.config('sabhero-articles.tables.prefix').'tag');
+        return $this->belongsToMany(Tag::class, config('sabhero-articles.tables.prefix') . 'post_' . config('sabhero-articles.tables.prefix') . 'tag');
     }
 
     public function user(): BelongsTo
@@ -72,7 +72,7 @@ class Post extends Model implements Feedable, HasMedia
 
     public function isNotPublished(): bool
     {
-        return ! $this->isStatusPublished();
+        return !$this->isStatusPublished();
     }
 
     public function scopePublished(Builder $query)
@@ -108,8 +108,8 @@ class Post extends Model implements Feedable, HasMedia
     public function relatedPosts($take = 3)
     {
         return $this->whereHas('categories', function ($query) {
-            $query->whereIn(config('sabhero-articles.tables.prefix').'categories.id', $this->categories->pluck('id'))
-                ->whereNotIn(config('sabhero-articles.tables.prefix').'posts.id', [$this->id]);
+            $query->whereIn(config('sabhero-articles.tables.prefix') . 'categories.id', $this->categories->pluck('id'))
+                ->whereNotIn(config('sabhero-articles.tables.prefix') . 'posts.id', [$this->id]);
         })->published()->with('user')->take($take)->get();
     }
 
@@ -142,12 +142,12 @@ class Post extends Model implements Feedable, HasMedia
                         ->schema([
                             TextInput::make('title')
                                 ->live(true)
-                                ->afterStateUpdated(fn (Set $set, ?string $state) => $set(
+                                ->afterStateUpdated(fn(Set $set, ?string $state) => $set(
                                     'slug',
                                     Str::slug($state)
                                 ))
                                 ->required()
-                                ->unique(config('sabhero-articles.tables.prefix').'posts', 'title', null, 'id')
+                                ->unique(config('sabhero-articles.tables.prefix') . 'posts', 'title', null, 'id')
                                 ->maxLength(255),
 
                             TextInput::make('slug')
@@ -298,7 +298,7 @@ class Post extends Model implements Feedable, HasMedia
 
     public function getTable(): string
     {
-        return config('sabhero-articles.tables.prefix').'posts';
+        return config('sabhero-articles.tables.prefix') . 'posts';
     }
 
     public static function getFeedItems()
@@ -313,7 +313,7 @@ class Post extends Model implements Feedable, HasMedia
     public function toFeedItem(): FeedItem
     {
         $siteUrl = config('app.url');
-        $articleUrl = $siteUrl.'/'.config('sabhero-articles.route.prefix');
+        $articleUrl = $siteUrl . '/' . config('sabhero-articles.route.prefix');
 
         $link = route('sabhero-articles.post.show', $this);
 
