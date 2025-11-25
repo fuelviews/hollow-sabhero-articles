@@ -233,14 +233,6 @@ class UserResource extends Resource
         return $record->name;
     }
 
-    public static function getRecordSubNavigation(Page $page): array
-    {
-        return $page->generateNavigationItems([
-            ViewUser::class,
-            EditUser::class,
-        ]);
-    }
-
     public static function getRelations(): array
     {
         return [
