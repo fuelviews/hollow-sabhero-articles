@@ -29,7 +29,7 @@ class CategoryResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-plus';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Article';
+    protected static UnitEnum|string|null $navigationGroup = 'Articles';
 
     protected static ?int $navigationSort = 1;
 

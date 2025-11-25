@@ -30,7 +30,7 @@ class TagResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Article';
+    protected static UnitEnum|string|null $navigationGroup = 'Articles';
 
     protected static ?int $navigationSort = 2;
 
@@ -85,8 +85,8 @@ class TagResource extends Resource
                         ->color('info')
                         ->excludeAttributes(['posts_count'])
                         ->beforeReplicaSaved(function ($replica): void {
-                            $replica->name = $replica->name.' (Copy)';
-                            $replica->slug = Str::slug($replica->name.' copy '.time());
+                            $replica->name = $replica->name . ' (Copy)';
+                            $replica->slug = Str::slug($replica->name . ' copy ' . time());
                         })
                         ->successNotificationTitle('Tag copied successfully'),
                     DeleteAction::make(),

@@ -39,7 +39,7 @@ class PostResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-minus';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Article';
+    protected static UnitEnum|string|null $navigationGroup = 'Articles';
 
     protected static ?string $recordTitleAttribute = 'title';
 
